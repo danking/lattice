@@ -19,9 +19,11 @@
 
 (define (make-flat-semi-lattice equivalence-predicate equivalence-hash-code)
   (semi-lattice (lambda (x y)
-                  (error 'join
-                         "no join of ~a and ~a in an unbounded flat semi-lattice"
-                         x y))
+                  (if (equivalence-predicate x y)
+                      x
+                      (error 'join
+                             "no join of ~a and ~a in an unbounded flat semi-lattice"
+                             x y)))
                 equivalence-predicate
                 equivalence-predicate
                 equivalence-hash-code))
@@ -41,13 +43,17 @@
 
 (define (make-flat-lattice equivalence-predicate equivalence-hash-code)
   (lattice (lambda (x y)
-             (error 'join
-                    "no join of ~a and ~a in an unbounded flat lattice"
-                    x y))
+             (if (equivalence-predicate x y)
+                 x
+                 (error 'join
+                        "no join of ~a and ~a in an unbounded flat lattice"
+                        x y)))
            equivalence-predicate
            (lambda (x y)
-             (error 'meet
-                    "no meet of ~a and ~a in an unbounded flat lattice"))
+             (if (equivalence-predicate x y)
+                 x
+                 (error 'meet
+                        "no meet of ~a and ~a in an unbounded flat lattice")))
            equivalence-predicate
            equivalence-predicate
            equivalence-hash-code))
