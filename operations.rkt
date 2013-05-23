@@ -3,6 +3,8 @@
 (require "data.rkt")
 (provide construct-lattice-from-semi-lattices
          construct-bounded-lattice-from-semi-lattices
+         get-join-semi-lattice-from-lattice
+         get-meet-semi-lattice-from-lattice
          make-bounded-lattice
          make-bounded-semi-lattice
          pointwise-semi-lattice
@@ -38,6 +40,24 @@
            (lambda (x)
              (+ ((semi-lattice-comparable?-hash-code join-semi-lattice) x)
                 ((semi-lattice-comparable?-hash-code meet-semi-lattice) x)))))
+
+;; get-join-semi-lattice-from-lattice : [Lattice FV] -> [Semi-Lattice FV]
+(define (get-join-semi-lattice-from-lattice lattice)
+  (semi-lattice (lattice-join lattice)
+                (lattice-gte? lattice)
+                ;; TODO is this correct? if it's comparable in the lattice it
+                ;; should be comparable in the X-semi-lattice too, right?
+                (lattice-comparable? lattice)
+                (lattice-comparable?-hash-code lattice)))
+
+;; get-meet-semi-lattice-from-lattice : [Lattice FV] -> [Semi-Lattice FV]
+(define (get-meet-semi-lattice-from-lattice lattice)
+  (semi-lattice (lattice-meet lattice)
+                (lattice-lte? lattice)
+                ;; TODO is this correct? if it's comparable in the lattice it
+                ;; should be comparable in the X-semi-lattice too, right?
+                (lattice-comparable? lattice)
+                (lattice-comparable?-hash-code lattice)))
 
 ;; make-bounded-semi-lattice : [Semi-Lattice FV]
 ;;                             ->
