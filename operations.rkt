@@ -37,9 +37,9 @@
              ;; semi-lattices?
              (and ((semi-lattice-comparable? join-semi-lattice) x y)
                   ((semi-lattice-comparable? meet-semi-lattice) x y)))
-           (lambda (x)
-             (+ ((semi-lattice-comparable?-hash-code join-semi-lattice) x)
-                ((semi-lattice-comparable?-hash-code meet-semi-lattice) x)))))
+           (lambda (x [recur equal-hash-code])
+             (+ ((semi-lattice-comparable?-hash-code join-semi-lattice) x recur)
+                ((semi-lattice-comparable?-hash-code meet-semi-lattice) x recur)))))
 
 ;; get-join-semi-lattice-from-lattice : [Lattice FV] -> [Semi-Lattice FV]
 (define (get-join-semi-lattice-from-lattice lattice)
@@ -89,10 +89,10 @@
     (or (identity? x) (identity? y)
         ((lattice-comparable? lattice) x y)))
 
-  (define (bounded-comparable?-hash-code x)
+  (define (bounded-comparable?-hash-code x [recur equal-hash-code])
     (if (or (identity? x))
-        (equal-hash-code x)
-        ((lattice-comparable?-hash-code lattice) x)))
+        (recur x)
+        ((lattice-comparable?-hash-code lattice) x recur)))
 
   (values (bounded-semi-lattice bounded-join
                                 bounded-gte?
@@ -161,10 +161,10 @@
         (bottom? x) (bottom? y)
         ((lattice-comparable? lattice) x y)))
 
-  (define (bounded-comparable?-hash-code x)
+  (define (bounded-comparable?-hash-code x [recur equal-hash-code])
     (if (or (top? x) (bottom? x))
-        (equal-hash-code x)
-        ((lattice-comparable?-hash-code lattice) x)))
+        (recur x)
+        ((lattice-comparable?-hash-code lattice) x recur)))
 
   (values (bounded-lattice bounded-join
                            bounded-gte?
@@ -201,8 +201,8 @@
          (and ((semi-lattice-comparable? lattice) (accessor x)
                                                   (accessor y))
               ...))
-       (define (lifted-comparable?-hash-code x)
-         (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x))
+       (define (lifted-comparable?-hash-code x [recur equal-hash-code])
+         (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x) recur)
             ...))
        (semi-lattice lifted-join
                      lifted-gte?
@@ -263,8 +263,8 @@
          (and ((lattice-comparable? lat) (accessor x)
                                                   (accessor y))
               ...))
-       (define (lifted-comparable?-hash-code x)
-         (+ ((lattice-comparable?-hash-code lat) (accessor x))
+       (define (lifted-comparable?-hash-code x [recur equal-hash-code])
+         (+ ((lattice-comparable?-hash-code lat) (accessor x) recur)
             ...))
        (lattice lifted-join
                 lifted-gte?
@@ -375,9 +375,9 @@
   (define (dictionary-comparable? dict1 dict2)
     (or (dictionary-gte? dict1 dict2)
         (dictionary-lte? dict1 dict2)))
-  (define (dictionary-comparable?-hash-code dict1)
-    (for/sum ([(k v) dict2])
-      ((lattice-comparable?-hash-code value-lattice) v)))
+  (define (dictionary-comparable?-hash-code dict1 [recur equal-hash-code])
+    (for/sum ([(k v) dict1])
+      ((lattice-comparable?-hash-code value-lattice) v recur)))
   (define-default-value-dict dict-top (bounded-lattice-top value-lattice))
   (define-default-value-dict dict-bottom (bounded-lattice-bottom value-lattice))
   (values (bounded-lattice dictionary-join

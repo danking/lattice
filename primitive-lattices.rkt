@@ -27,13 +27,13 @@
                 equivalence-hash-code))
 
 (define flat-equal?-semi-lattice
-  (make-flat-semi-lattice equal? equal-hash-code))
+  (make-flat-semi-lattice equal? (lambda (x _) (equal-hash-code x))))
 
 (define flat-eqv?-semi-lattice
-  (make-flat-semi-lattice eqv? eqv-hash-code))
+  (make-flat-semi-lattice eqv? (lambda (x _) (eqv-hash-code x))))
 
 (define flat-eq?-semi-lattice
-  (make-flat-semi-lattice eq? eq-hash-code))
+  (make-flat-semi-lattice eq? (lambda (x _) (eq-hash-code x))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,13 +53,13 @@
            equivalence-hash-code))
 
 (define flat-equal?-lattice
-  (make-flat-lattice equal? equal-hash-code))
+  (make-flat-lattice equal? (lambda (x _) (equal-hash-code x))))
 
 (define flat-eqv?-lattice
-  (make-flat-lattice eqv? eqv-hash-code))
+  (make-flat-lattice eqv? (lambda (x _) (eqv-hash-code x))))
 
 (define flat-eq?-lattice
-  (make-flat-lattice eq? eq-hash-code))
+  (make-flat-lattice eq? (lambda (x _) (eq-hash-code x))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

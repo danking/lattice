@@ -12,7 +12,7 @@
 ;;   (semi-lattice [FV FV -> FV]
 ;;                 [FV FV -> Boolean]
 ;;                 [FV FV -> Boolean]
-;;                 [FV -> Number])
+;;                 [FV [Optional [Any -> Number]] -> Number])
 ;;
 ;;  where join(x,y) is the least upper bound of x and y,
 ;;        gte(x,y) is x >= y, or does x subsume y,
@@ -30,7 +30,7 @@
 ;;   (bounded-semi-lattice [FV FV -> FV]
 ;;                         [FV FV -> Boolean]
 ;;                         [FV FV -> Boolean]
-;;                         [FV -> Number]
+;;                         [FV [Optional [Any -> Number]] -> Number]
 ;;                         FV)
 ;;
 ;;  where the first four arguments are the same as [Lattice FV], and
@@ -53,7 +53,7 @@
 ;;            [FV FV -> FV]
 ;;            [FV FV -> Boolean]
 ;;            [FV FV -> Boolean]
-;;            [FV -> Number])
+;;            [FV [Optional [Any -> Number]] -> Number])
 ;;
 ;;  where join(x,y) is the least upper bound of x and y,
 ;;        gte?(x,y) is x >= y, or does x subsume y,
@@ -71,7 +71,7 @@
 ;;            [FV FV -> FV]
 ;;            [FV FV -> Boolean]
 ;;            [FV FV -> Boolean]
-;;            [FV -> Number]
+;;            [FV [Optional [Any -> Number]] -> Number]
 ;;            FV
 ;;            FV)
 ;;
