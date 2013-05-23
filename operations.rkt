@@ -486,7 +486,11 @@
   (check-true (gte?-number-domain-dicts doubles blondd-bottom))
   ;; is bottom identity for join?
   (check-equal? (join-number-domain-dicts squares blondd-bottom) squares)
-  (check-equal? (join-number-domain-dicts doubles blondd-bottom) doubles))
+  (check-equal? (join-number-domain-dicts doubles blondd-bottom) doubles)
+  ;; bottom should be equivalent to the empty dict
+  ;; (check-equal? blondd-bottom (hash)) ;; this fails...
+  (check-true (gte?-number-domain-dicts blondd-bottom (hash)))
+  (check-true (gte?-number-domain-dicts (hash) blondd-bottom)))
 
 ;; produces a "fake" dictionary which simply maps to the def-value and has the
 ;; structure name name
