@@ -299,20 +299,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionaries
 
-;; dictionary-fold2 : [Dict K V] [Dict K V] [V V Y -> Y] V Y -> Y
-;;
-;; In an unspecified order, combines values with equivalent keys and a base
-;; value to produce a new value.
-;;
-;; The default element is used for values where one dictionary maps a key to a
-;; value and the other dictionary does not.
-(define (dictionary-fold2 d1 d2 f default base)
-  (for/fold ([base base])
-            ([key (in-set (all-keys d1 d2))])
-    (f (dict-ref d1 key default)
-       (dict-ref d2 key default)
-       base)))
-
 ;; dictionary-merge : [Dict K V] [Dict K V] [V V -> V] V -> [Dict K V]
 ;;
 ;; Produces a dictionary which maps a given key to f(dict1(key), dict2(key)).
@@ -389,12 +375,9 @@
   (define (dictionary-comparable? dict1 dict2)
     (or (dictionary-gte? dict1 dict2)
         (dictionary-lte? dict1 dict2)))
-  (define (dictionary-comparable?-hash-code dict1 dict2)
-    (dictionary-fold2 dict1 dict2
-                      (lambda (v1 v2 running-hash-code)
-                        (+ ((lattice-comparable?-hash-code value-lattice) v1)
-                           ((lattice-comparable?-hash-code value-lattice) v2)
-                           running-hash-code))))
+  (define (dictionary-comparable?-hash-code dict1)
+    (for/sum ([(k v) dict2])
+      ((lattice-comparable?-hash-code value-lattice) v)))
   (define-default-value-dict dict-top (bounded-lattice-top value-lattice))
   (define-default-value-dict dict-bottom (bounded-lattice-bottom value-lattice))
   (values (bounded-lattice dictionary-join
