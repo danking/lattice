@@ -29,13 +29,13 @@
                 equivalence-hash-code))
 
 (define flat-equal?-semi-lattice
-  (make-flat-semi-lattice equal? (lambda (x _) (equal-hash-code x))))
+  (make-flat-semi-lattice equal? (lambda (x [_ #f]) (equal-hash-code x))))
 
 (define flat-eqv?-semi-lattice
-  (make-flat-semi-lattice eqv? (lambda (x _) (eqv-hash-code x))))
+  (make-flat-semi-lattice eqv? (lambda (x [_ #f]) (eqv-hash-code x))))
 
 (define flat-eq?-semi-lattice
-  (make-flat-semi-lattice eq? (lambda (x _) (eq-hash-code x))))
+  (make-flat-semi-lattice eq? (lambda (x [_ #f]) (eq-hash-code x))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,13 +59,13 @@
            equivalence-hash-code))
 
 (define flat-equal?-lattice
-  (make-flat-lattice equal? (lambda (x _) (equal-hash-code x))))
+  (make-flat-lattice equal? (lambda (x [_ #f]) (equal-hash-code x))))
 
 (define flat-eqv?-lattice
-  (make-flat-lattice eqv? (lambda (x _) (eqv-hash-code x))))
+  (make-flat-lattice eqv? (lambda (x [_ #f]) (eqv-hash-code x))))
 
 (define flat-eq?-lattice
-  (make-flat-lattice eq? (lambda (x _) (eq-hash-code x))))
+  (make-flat-lattice eq? (lambda (x [_ #f]) (eq-hash-code x))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,7 +74,7 @@
 (define ascending-semi-lattice-on-numbers
   (semi-lattice max >=
                 (lambda (x y) (and (number? x) (number? y)))
-                equal-hash-code))
+                (lambda (x [_ #f]) (equal-hash-code x))))
 (module+ test
   (let ((join (semi-lattice-join ascending-semi-lattice-on-numbers))
         (gte? (semi-lattice-gte? ascending-semi-lattice-on-numbers)))
@@ -89,7 +89,7 @@
 (define descending-semi-lattice-on-numbers
   (semi-lattice min <=
                 (lambda (x y) (and (number? x) (number? y)))
-                equal-hash-code))
+                (lambda (x [_ #f]) (equal-hash-code x))))
 (module+ test
   (let ((join (semi-lattice-join descending-semi-lattice-on-numbers))
         (gte? (semi-lattice-gte? descending-semi-lattice-on-numbers)))
