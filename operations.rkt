@@ -181,9 +181,8 @@
          (and ((semi-lattice-comparable? lattice) (accessor x)
                                                   (accessor y))
               ...))
-       (define (lifted-comparable?-hash-code x y)
-         (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x)
-                                                          (accessor y))
+       (define (lifted-comparable?-hash-code x)
+         (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x))
             ...))
        (semi-lattice lifted-join
                      lifted-gte?
@@ -244,9 +243,8 @@
          (and ((lattice-comparable? lat) (accessor x)
                                                   (accessor y))
               ...))
-       (define (lifted-comparable?-hash-code x y)
-         (+ ((lattice-comparable?-hash-code lat) (accessor x)
-                                                          (accessor y))
+       (define (lifted-comparable?-hash-code x)
+         (+ ((lattice-comparable?-hash-code lat) (accessor x))
             ...))
        (lattice lifted-join
                 lifted-gte?
