@@ -143,7 +143,7 @@
           [else ((lattice-gte? lattice) x y)]))
 
   (define (bounded-meet x y)
-    (cond [(or (bottom? x) (bottom? y)) top]
+    (cond [(or (bottom? x) (bottom? y)) bottom]
           [(top? x) y]
           [(top? y) x]
           [else ((lattice-meet lattice) x y)]))
