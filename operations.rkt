@@ -6,6 +6,7 @@
          get-join-semi-lattice-from-lattice
          get-meet-semi-lattice-from-lattice
          make-bounded-lattice
+         make-bounded-lattice/with-top&bottom
          make-bounded-semi-lattice
          pointwise-semi-lattice
          pointwise-bounded-semi-lattice
@@ -131,6 +132,25 @@
   (struct top ())
   (struct bottom ())
 
+  (values (make-bounded-lattice/with-top&bottom lattice
+                                                (top) top?
+                                                (bottom) bottom?)
+          (top) top?
+          (bottom) bottom?))
+
+
+;; make-bounded-lattice/with-top&bottom : [Lattice FV]
+;;                                        Top
+;;                                        [Any -> Boolean]
+;;                                        Bottom
+;;                                        [Any -> Boolean]
+;;                                        ->
+;;                                        [Bounded-Lattice [U FV Top Bottom]]
+;;
+;; The last two predicate functions are predicates for the Top and the Bottom
+;; types.
+;;
+(define (make-bounded-lattice/with-top&bottom lattice top top? bottom bottom?)
   (define (bounded-join x y)
     (cond [(or (top? x) (top? y)) top]
           [(bottom? x) y]
@@ -163,15 +183,14 @@
         (recur x)
         ((lattice-comparable?-hash-code lattice) x recur)))
 
-  (values (bounded-lattice bounded-join
-                           bounded-gte?
-                           bounded-meet
-                           bounded-lte?
-                           bounded-comparable?
-                           bounded-comparable?-hash-code
-                           (top)
-                           (bottom))
-          (top) top? (bottom) bottom?))
+  (bounded-lattice bounded-join
+                   bounded-gte?
+                   bounded-meet
+                   bounded-lte?
+                   bounded-comparable?
+                   bounded-comparable?-hash-code
+                   top
+                   bottom))
 
 ;; pointwise-semi-lattice : [A ... -> B]
 ;;                          ([B -> A] [Semi-Lattice A]) ...
