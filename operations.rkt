@@ -61,15 +61,12 @@
 
 ;; make-bounded-semi-lattice : [Semi-Lattice FV]
 ;;                             ->
-;;                             ∃Top∃Bottom.
+;;                             ∃Identity.
 ;;                               [Bounded-Semi-Lattice [U FV Top Bottom]]
-;;                               Top
-;;                               [Any -> Boolean]
-;;                               Bottom
+;;                               Identity
 ;;                               [Any -> Boolean]
 ;;
-;; The last two predicate functions are predicates for the Top and the Bottom
-;; types.
+;; The predicate function is a predicate for the Identity type.
 ;;
 (define (make-bounded-semi-lattice lattice)
   ;; prefabs wouldn't work here because prefabs rely on unique names
