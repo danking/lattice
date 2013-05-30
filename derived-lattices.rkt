@@ -84,6 +84,13 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Truth Lattices
+
+(define lattice-on-truth
+  (construct-lattice-from-semi-lattices truth-top-boolean-semi-lattice
+                                        truth-bottom-boolean-semi-lattice))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Number Lattices
 
 (define lattice-on-numbers

@@ -9,6 +9,8 @@
          flat-equal?-lattice
          flat-eqv?-lattice
          flat-eq?-lattice
+         truth-top-boolean-semi-lattice
+         truth-bottom-boolean-semi-lattice
          ascending-semi-lattice-on-numbers
          descending-semi-lattice-on-numbers)
 
@@ -66,6 +68,53 @@
 
 (define flat-eq?-lattice
   (make-flat-lattice eq? (lambda (x [_ #f]) (eq-hash-code x))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Boolean Semi-Lattices
+
+(define truth-top-boolean-semi-lattice
+  (semi-lattice (lambda (x y) (or x y))
+                (lambda (x y) (implies y x))
+                (lambda (x y) (boolean? x) (boolean? y))
+                (lambda (x [_ #f]) (equal-hash-code x))))
+(module+ test
+  (let ((join (semi-lattice-join truth-top-boolean-semi-lattice))
+        (gte? (semi-lattice-gte? truth-top-boolean-semi-lattice)))
+    ;; join
+    (check-true (join #t #t))
+    (check-true (join #t #f))
+    (check-true (join #f #t))
+    (check-false (join #f #f))
+    ;; gte?
+    (check-true (gte? #t #t))
+    (check-true (gte? #t #f))
+    (check-false (gte? #f #t))
+    (check-true (gte? #f #f))))
+
+(define truth-bottom-boolean-semi-lattice
+  (semi-lattice (lambda (x y) (and x y))
+                (lambda (x y) (implies x y))
+                (lambda (x y) (boolean? x) (boolean? y))
+                (lambda (x [_ #f]) (equal-hash-code x))))
+(module+ test
+  (let ((join (semi-lattice-join truth-bottom-boolean-semi-lattice))
+        (gte? (semi-lattice-gte? truth-bottom-boolean-semi-lattice)))
+    ;; join
+    (check-true (join #t #t))
+    (check-false (join #t #f))
+    (check-false (join #f #t))
+    (check-false (join #f #f))
+    ;; gte?
+    (check-true (gte? #t #t))
+    (check-false (gte? #t #f))
+    (check-true (gte? #f #t))
+    (check-true (gte? #f #f))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Boolean Bounded-Semi-Lattices
+
+;; TODO
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
