@@ -12,6 +12,7 @@
          pointwise-bounded-semi-lattice
          pointwise-lattice
          pointwise-bounded-lattice
+         lattice-disjoint-union
          make-bounded-dictionary-lattice)
 
 (module+ test
