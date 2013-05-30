@@ -14,7 +14,16 @@
          pointwise-bounded-lattice
          make-bounded-dictionary-lattice)
 
-(module+ test (require rackunit "primitive-lattices.rkt"))
+(module+ test
+  (require rackunit "primitive-lattices.rkt")
+  ;; lattice-on-numbers and lattice-on-truth is defined in derived-lattices.rkt,
+  ;; but requiring that file here would cause a circular depdendcy
+  (define lattice-on-numbers
+    (construct-lattice-from-semi-lattices ascending-semi-lattice-on-numbers
+                                          descending-semi-lattice-on-numbers))
+  (define lattice-on-truth
+    (construct-lattice-from-semi-lattices truth-top-boolean-semi-lattice
+                                          truth-bottom-boolean-semi-lattice)))
 
 ;; construct-lattice-from-semis : [Semi-Lattice FV]
 ;;                                [Semi-Lattice FV]
@@ -312,6 +321,147 @@
         lifted-top
         lifted-bottom)))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Disjoint Unions
+
+;; lattice-disjoint-union : [Lattice A]
+;;                          [Any -> Boolean]
+;;                          [Lattice B]
+;;                          [Any -> Boolean]
+;;                          ->
+;;                          [Lattice [U A B]]
+;;
+;; The two predicates are guards to ensure that values are only operated on with
+;; the operate lattice operations.
+;;
+(define (lattice-disjoint-union left left? right right?)
+  ;; disjoint-ops/default : X [A A -> X] [B B -> X] -> X
+  ;;
+  ;; An abstraction for choosing hte appropriate lattice operation baesd on the
+  ;; predicates. Returns the default value if neither predicate holds on both
+  ;; arguments
+  ;;
+  (define (disjoint-ops/default default left-op right-op)
+    (lambda (x y)
+      (cond [(and (left? x) (left? y)) (left-op x y)]
+            [(and (right? x) (right? y)) (right-op x y)]
+            [else default])))
+  ;; disjoint-ops/err : Symbol [A A -> X] [B B -> Y] -> [U X Y]
+  ;;
+  ;; An abstraction for choosing the appropriate lattice operation based on the
+  ;; predicates. Throws an error if neither predicates holds on both arguments
+  ;;
+  (define (disjoint-ops/err error-name left-op right-op)
+    (lambda (x y)
+      (cond [(and (left? x) (left? y)) (left-op x y)]
+            [(and (right? x) (right? y)) (right-op x y)]
+            [else
+             (error error-name
+                    (string-append
+                     "must be given two elements, both from either the left or "
+                     "right lattice; given ~a and ~a.")
+                    x y)])))
+  (define lifted-join
+    (disjoint-ops/err 'lattice-disjoint-union-join
+                      (lattice-join left)
+                      (lattice-join right)))
+  (define lifted-gte?
+    (disjoint-ops/default #f
+                          (lattice-gte? left)
+                          (lattice-gte? right)))
+  (define lifted-meet
+    (disjoint-ops/err 'lattice-disjoint-union-meet
+                      (lattice-meet left)
+                      (lattice-meet right)))
+  (define lifted-lte?
+    (disjoint-ops/default #f
+                          (lattice-lte? left)
+                          (lattice-lte? right)))
+  (define lifted-comparable?
+    (disjoint-ops/default #f
+                          (lattice-comparable? left)
+                          (lattice-comparable? right)))
+  (define lifted-comparable?-hash-code
+    (disjoint-ops/default 0
+                          (lattice-comparable?-hash-code left)
+                          (lattice-comparable?-hash-code right)))
+  (lattice lifted-join
+           lifted-gte?
+           lifted-meet
+           lifted-lte?
+           lifted-comparable?
+           lifted-comparable?-hash-code))
+
+(module+ test
+  (let ()
+    (define strings-and-numbers-lattice
+      (lattice-disjoint-union lattice-on-numbers
+                              number?
+                              lattice-on-truth
+                              boolean?))
+    (define join (lattice-join strings-and-numbers-lattice))
+    (define gte? (lattice-gte? strings-and-numbers-lattice))
+    (define meet (lattice-meet strings-and-numbers-lattice))
+    (define lte? (lattice-lte? strings-and-numbers-lattice))
+    ;; The next eight sections of checks are from the primitive-lattices.rkt
+    ;; truth join
+    (check-true (join #t #t))
+    (check-true (join #t #f))
+    (check-true (join #f #t))
+    (check-false (join #f #f))
+    ;; truth gte?
+    (check-true (gte? #t #t))
+    (check-true (gte? #t #f))
+    (check-false (gte? #f #t))
+    (check-true (gte? #f #f))
+    ;; truth meet
+    (check-true (meet #t #t))
+    (check-false (meet #t #f))
+    (check-false (meet #f #t))
+    (check-false (meet #f #f))
+    ;; truth lte?
+    (check-true (lte? #t #t))
+    (check-false (lte? #t #f))
+    (check-true (lte? #f #t))
+    (check-true (lte? #f #f))
+    ;; number join
+    (check-equal? (join 0 1) 1)
+    (check-equal? (join -1 1) 1)
+    (check-equal? (join 10 100) 100)
+    ;; number gte?
+    (check-false (gte? 0 1))
+    (check-true (gte? 0 0))
+    (check-true (gte? 0 -1))
+    (check-true (gte? 100 10))
+    ;; number meet
+    (check-equal? (meet 0 1) 0)
+    (check-equal? (meet -1 1) -1)
+    (check-equal? (meet 10 100) 10)
+    ;; number lte?
+    (check-true (lte? 0 1))
+    (check-true (lte? 0 0))
+    (check-false (lte? 0 -1))
+    (check-false (lte? 100 10))
+    ;; combinations
+    (for ((op (list gte? lte?))
+          (num (list 10 -10))
+          (bool (list #t #f)))
+      (check-false (op num bool))
+      (check-false (op bool num)))
+    (for ((op (list join meet))
+          (num (list 10 -10))
+          (bool (list #t #f)))
+      (check-exn exn:fail? (lambda () (op num bool)))
+      (check-exn exn:fail? (lambda () (op bool num))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Linear Sums
+
+;; TODO
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionaries
 
@@ -409,14 +559,9 @@
           (dict-bottom)
           dict-bottom?))
 (module+ test
-  ;; lattice on numbers (i.e. (construct-lattice...)) is defined in
-  ;; derived-lattices.rkt, but requiring that file here would cause a circular
-  ;; depdendcy
   (define-values
     (bounded-lattice-on-numbers blon-top blon-top? blon-bottom blon-bottom?)
-    (make-bounded-lattice
-     (construct-lattice-from-semi-lattices ascending-semi-lattice-on-numbers
-                                           descending-semi-lattice-on-numbers)))
+    (make-bounded-lattice lattice-on-numbers))
   (define-values
     (bounded-lattice-on-number-domain-dicts
      blondd-top blondd-top? blondd-bottom blondd-bottom?)
