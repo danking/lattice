@@ -553,7 +553,7 @@
     (for/sum ([(k v) dict1])
       ((lattice-comparable?-hash-code value-lattice) v recur)))
   (define-default-value-dict dict-top (bounded-lattice-top value-lattice))
-  (define-default-value-dict dict-bottom (bounded-lattice-bottom value-lattice))
+  ;; (define-default-value-dict dict-bottom (bounded-lattice-bottom value-lattice))
   (values (bounded-lattice dictionary-join
                            dictionary-gte?
                            dictionary-meet
@@ -561,10 +561,10 @@
                            dictionary-comparable?
                            dictionary-comparable?-hash-code
                            (dict-top)
-                           (dict-bottom))
+                           (hash))
           (dict-top)
           dict-top?
-          (dict-bottom)
+          (hash)
           dict-bottom?))
 (module+ test
   (define-values
