@@ -483,8 +483,8 @@
 ;; dictionaries where only values with equivalent keys are compared
 ;;
 (define (dictionary-andmap2 dict1 dict2 predicate)
-  (and (equal? (list->set (dict-keys d1))
-               (list->set (dict-keys d2)))
+  (and (equal? (list->set (dict-keys dict1))
+               (list->set (dict-keys dict2)))
        (for/and ([key (in-keys dict1)])
          (predicate (dict-ref dict1 key) (dict-ref dict2 key)))))
 
