@@ -477,14 +477,16 @@
               k
               (f v (dict-ref new-dict k identity)))))
 
-;; dictionary-andmap2 : [Dict K V] [Dict K V] [V -> Boolean] V -> Boolean
+;; dictionary-andmap2 : [Dict K V] [Dict K V] [V -> Boolean] -> Boolean
 ;;
 ;; This is used to point-wise lift predicates on values to predicates on
 ;; dictionaries where only values with equivalent keys are compared
 ;;
-(define (dictionary-andmap2 dict1 dict2 predicate default)
-  (for/and ([key (in-set (all-keys dict1 dict2))])
-    (predicate (dict-ref dict1 key default) (dict-ref dict2 key default))))
+(define (dictionary-andmap2 dict1 dict2 predicate)
+  (and (equal? (list->set (dict-keys d1))
+               (list->set (dict-keys d2)))
+       (for/and ([key (in-keys dict1)])
+         (predicate (dict-ref dict1 key) (dict-ref dict2 key)))))
 
 ;; all-keys [Dict K V] [Dict K V] -> [SetOf K]
 ;;
