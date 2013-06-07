@@ -477,14 +477,14 @@
               k
               (f v (dict-ref new-dict k identity)))))
 
-;; dictionary-andmap2 : [Dict K V] [Dict K V] [V -> Boolean] -> Boolean
+;; dictionary-andmap2 : [Dict K V] [Dict K V] [V -> Boolean] V -> Boolean
 ;;
 ;; This is used to point-wise lift predicates on values to predicates on
 ;; dictionaries where only values with equivalent keys are compared
 ;;
-(define (dictionary-andmap2 dict1 dict2 predicate)
+(define (dictionary-andmap2 dict1 dict2 predicate default)
   (for/and ([key (in-set (all-keys dict1 dict2))])
-    (predicate (dict-ref dict1 key) (dict-ref dict2 key))))
+    (predicate (dict-ref dict1 key default) (dict-ref dict2 key default))))
 
 ;; all-keys [Dict K V] [Dict K V] -> [SetOf K]
 ;;
@@ -531,14 +531,18 @@
                       (lattice-join value-lattice)
                       (bounded-lattice-bottom value-lattice)))
   (define (dictionary-gte? dict1 dict2)
-    (dictionary-andmap2 dict1 dict2 (lattice-gte? value-lattice)))
+    (dictionary-andmap2 dict1 dict2
+                        (lattice-gte? value-lattice)
+                        (bounded-lattice-bottom value-lattice)))
   (define (dictionary-meet dict1 dict2)
     (dictionary-merge dict1
                       dict2
                       (lattice-meet value-lattice)
                       (bounded-lattice-top value-lattice)))
   (define (dictionary-lte? dict1 dict2)
-    (dictionary-andmap2 dict1 dict2 (lattice-lte? value-lattice)))
+    (dictionary-andmap2 dict1 dict2
+                        (lattice-lte? value-lattice)
+                        (bounded-lattice-bottom value-lattice)))
   (define (dictionary-comparable? dict1 dict2)
     (or (dictionary-gte? dict1 dict2)
         (dictionary-lte? dict1 dict2)))
