@@ -483,7 +483,8 @@
 ;; dictionaries where only values with equivalent keys are compared
 ;;
 (define (dictionary-andmap2 dict1 dict2 predicate default)
-  (for/and ([key (in-set (all-keys dict1 dict2))])
+  (for/and ([key (sequence-append (in-dict-keys dict1)
+                                  (in-dict-keys dict2))])
     (predicate (dict-ref dict1 key default) (dict-ref dict2 key default))))
 
 ;; all-keys [Dict K V] [Dict K V] -> [SetOf K]
@@ -531,18 +532,20 @@
                       (lattice-join value-lattice)
                       (bounded-lattice-bottom value-lattice)))
   (define (dictionary-gte? dict1 dict2)
-    (dictionary-andmap2 dict1 dict2
-                        (lattice-gte? value-lattice)
-                        (bounded-lattice-bottom value-lattice)))
+    (or (eq? dict1 dict2)
+        (dictionary-andmap2 dict1 dict2
+                            (lattice-gte? value-lattice)
+                            (bounded-lattice-bottom value-lattice))))
   (define (dictionary-meet dict1 dict2)
     (dictionary-merge dict1
                       dict2
                       (lattice-meet value-lattice)
                       (bounded-lattice-top value-lattice)))
   (define (dictionary-lte? dict1 dict2)
-    (dictionary-andmap2 dict1 dict2
-                        (lattice-lte? value-lattice)
-                        (bounded-lattice-bottom value-lattice)))
+    (or (eq? dict1 dict2)
+        (dictionary-andmap2 dict1 dict2
+                            (lattice-lte? value-lattice)
+                            (bounded-lattice-bottom value-lattice))))
   (define (dictionary-comparable? dict1 dict2)
     (or (dictionary-gte? dict1 dict2)
         (dictionary-lte? dict1 dict2)))
