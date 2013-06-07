@@ -545,7 +545,7 @@
     (or (eq? dict1 dict2)
         (dictionary-andmap2 dict1 dict2
                             (lattice-lte? value-lattice)
-                            (bounded-lattice-bottom value-lattice))))
+                            (bounded-lattice-top value-lattice))))
   (define (dictionary-comparable? dict1 dict2)
     (or (dictionary-gte? dict1 dict2)
         (dictionary-lte? dict1 dict2)))
