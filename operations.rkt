@@ -565,7 +565,9 @@
           (dict-top)
           dict-top?
           (hash)
-          dict-bottom?))
+          (lambda (x)
+            (and (hash? x)
+                 (= (hash-count x) 0)))))
 (module+ test
   (define-values
     (bounded-lattice-on-numbers blon-top blon-top? blon-bottom blon-bottom?)
