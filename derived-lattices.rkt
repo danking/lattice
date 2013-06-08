@@ -10,7 +10,9 @@
          make-bounded-flat-lattice
          bounded-flat-equal?-lattice
          bounded-flat-eqv?-lattice
-         bounded-flat-eq?-lattice)
+         bounded-flat-eq?-lattice
+         lattice-on-truth
+         lattice-on-numbers)
 
 (module+ test (require rackunit))
 
