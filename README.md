@@ -1,5 +1,7 @@
 # Racket Lattice Library
 
+![Travis-CI Status Image](https://travis-ci.org/danking/lattice.svg?branch=master)
+
 The file `main.rkt` exports all the relevant bindings for the library. The
 library is organized into four separate files:
 
