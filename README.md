@@ -1,6 +1,6 @@
 # Racket Lattice Library
 
-The file `lattice.rkt` exports all the relevant bindings for the library. The
+The file `main.rkt` exports all the relevant bindings for the library. The
 library is organized into four separate files:
 
   - `data.rkt` -- the data definitions for (bounded-)(semi-)lattices.
