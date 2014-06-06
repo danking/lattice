@@ -600,7 +600,9 @@
   (check-equal? smaller
                 (hash 0.25 0.0625  0.5 0.25  1 1  2 4  3 6  4 8  5 10))
   (check-true (blon-top? (dict-ref blondd-top 1)))
-  (check-true (blon-bottom? (dict-ref blondd-bottom 1)))
+  (check-true (empty? (dict-keys blondd-bottom)))
+  (check-true (gte?-number-domain-dicts blondd-bottom (hash 1 blon-bottom 2 blon-bottom)))
+  (check-true (gte?-number-domain-dicts (hash 1 blon-bottom 2 blon-bottom) blondd-bottom))
   ;; sanity checks on predicates
   (check-true (blondd-top? blondd-top))
   (check-true (blondd-bottom? blondd-bottom))
