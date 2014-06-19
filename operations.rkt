@@ -466,21 +466,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionaries
 
-(define (dict-set* d k v)
-  (if (dict-can-functional-set? d)
-      (dict-set d k v)
-      (begin (hash-set! d k v) d)))
-
 ;; dictionary-merge : [Dict K V] [Dict K V] [V V -> V] V -> [Dict K V]
 ;;
 ;; Produces a dictionary which maps a given key to f(dict1(key), dict2(key)).
 ;; It must be the case that f(x, identity) = x.
 (define (dictionary-merge dict1 dict2 f identity)
-  (for/fold ([new-dict dict1])
-            ([(k v) (in-dict dict2)])
-    (dict-set* new-dict
-               k
-               (f v (dict-ref new-dict k identity)))))
+  (if (dict-can-functional-set? dict1)
+      (for/fold ([new-dict dict1])
+          ([(k v) (in-dict dict2)])
+        (dict-set new-dict
+                  k
+                  (f v (dict-ref new-dict k identity))))
+      (for/fold ([new-dict (dict-copy dict1)])
+          ([(k v) (in-dict dict2)])
+        (dict-set! new-dict
+                   k
+                   (f v (dict-ref new-dict k identity))))))
 
 ;; dictionary-andmap2 : [Dict K V] [Dict K V] [V -> Boolean] V -> Boolean
 ;;
