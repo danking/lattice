@@ -11,6 +11,8 @@
          bounded-flat-equal?-lattice
          bounded-flat-eqv?-lattice
          bounded-flat-eq?-lattice
+         bounded-ascending-semi-lattice-on-numbers
+         bounded-descending-semi-lattice-on-numbers
          lattice-on-truth
          lattice-on-numbers
          bounded-lattice-on-numbers)
@@ -85,6 +87,9 @@
     (check-false (gte? baslon-bottom 10))
     (check-false (gte? baslon-bottom -10))))
 
+(define-values
+  (bounded-descending-semi-lattice-on-numbers bdslon-bottom bdslon-bottom?)
+  (make-bounded-semi-lattice descending-semi-lattice-on-numbers))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Truth Lattices
