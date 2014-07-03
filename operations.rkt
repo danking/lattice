@@ -79,28 +79,28 @@
 ;;
 ;; The predicate function is a predicate for the Identity type.
 ;;
-(define (make-bounded-semi-lattice lattice)
+(define (make-bounded-semi-lattice semi-lattice)
   ;; prefabs wouldn't work here because prefabs rely on unique names
   (struct identity ())
 
   (define (bounded-join x y)
     (cond [(identity? x) y]
           [(identity? y) x]
-          [else ((lattice-join lattice) x y)]))
+          [else ((semi-lattice-join semi-lattice) x y)]))
 
   (define (bounded-gte? x y)
     (cond [(identity? y) #t]  ;; everything >= identity
           [(identity? x) #f]  ;; identity >= nothing
-          [else ((lattice-gte? lattice) x y)]))
+          [else ((semi-lattice-gte? semi-lattice) x y)]))
 
   (define (bounded-comparable? x y)
     (or (identity? x) (identity? y)
-        ((lattice-comparable? lattice) x y)))
+        ((semi-lattice-comparable? semi-lattice) x y)))
 
   (define (bounded-comparable?-hash-code x [recur equal-hash-code])
     (if (or (identity? x))
         (recur x)
-        ((lattice-comparable?-hash-code lattice) x recur)))
+        ((semi-lattice-comparable?-hash-code semi-lattice) x recur)))
 
   (values (bounded-semi-lattice bounded-join
                                 bounded-gte?
