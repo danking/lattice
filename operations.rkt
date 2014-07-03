@@ -205,7 +205,7 @@
 ;; pointwise-semi-lattice : [A ... -> B]
 ;;                          ([B -> A] [Semi-Lattice A]) ...
 ;;                          ->
-;;                          [Semi-Lattipce B]
+;;                          [Semi-Lattice B]
 ;;
 ;; Given a structure creator, structor accessors, and semi-lattices for each
 ;; accessor, `pointwise-semi-lattice' produces a point-wise lifted semi-lattice
