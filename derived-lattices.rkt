@@ -12,7 +12,8 @@
          bounded-flat-eqv?-lattice
          bounded-flat-eq?-lattice
          lattice-on-truth
-         lattice-on-numbers)
+         lattice-on-numbers
+         bounded-lattice-on-numbers)
 
 (module+ test (require rackunit))
 
@@ -98,3 +99,8 @@
 (define lattice-on-numbers
   (construct-lattice-from-semi-lattices ascending-semi-lattice-on-numbers
                                         descending-semi-lattice-on-numbers))
+
+(define bounded-lattice-on-numbers
+  (construct-bounded-lattice-from-semi-lattices
+   bounded-ascending-semi-lattice-on-numbers
+   bounded-descending-semi-lattice-on-numbers))
