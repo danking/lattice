@@ -8,6 +8,7 @@
          make-bounded-lattice
          make-bounded-lattice/with-top&bottom
          make-bounded-semi-lattice
+         lexicographic-pointwise-semi-lattice/2
          pointwise-semi-lattice
          pointwise-bounded-semi-lattice
          pointwise-lattice
@@ -201,6 +202,56 @@
                    bounded-comparable?-hash-code
                    top
                    bottom))
+
+;; lexicographic-pointwise-semi-lattice : [X Y -> B]
+;;                                        ([B -> X] [Semi-Lattice X])
+;;                                        ([B -> Y] [Semi-Lattice Y])
+;;                                        ->
+;;                                        [Semi-Lattice B]
+;;
+;; In this case we use lexicographic ordering (1, 0) <= (1, 5) and (2, 1) <= (1, 5)
+(define-syntax lexicographic-pointwise-semi-lattice/2
+  (syntax-rules ()
+    ((_ creator (accessor1 lattice1) (accessor2 lattice2))
+     (let ()
+       (define (lifted-join x y)
+         (define gte1? (semi-lattice-gte? lattice1))
+         (define x.1>=y.1 (gte1? (accessor1 x) (accessor1 y)))
+         (define y.1>=x.1 (gte1? (accessor1 y) (accessor1 x)))
+         (define x.1==y.1 (and x.1>=y.1 y.1>=x.1))
+         (cond
+          [x.1==y.1
+           (creator (accessor1 x)
+                    ((semi-lattice-join lattice2) (accessor2 x) (accessor2 y)))]
+          [x.1>=y.1 x] ; the first component of x is strictly larger than "" "" y
+          [y.1>=x.1 y] ; the first component of y is strictly larger than "" "" x
+          ))
+       (define (lifted-gte? x y)
+         (define gte1? (semi-lattice-gte? lattice1))
+         (define gte2? (semi-lattice-gte? lattice2))
+         (define x.1>=y.1 (gte1? (accessor1 x) (accessor1 y)))
+         (define y.1>=x.1 (gte1? (accessor1 y) (accessor1 x)))
+         (define x.1==y.1 (and x.1>=y.1 y.1>=x.1))
+         (if x.1==y.1
+             (gte2? (accessor2 x) (accessor2 y))
+             x.1>=y.1))
+       (define (lifted-comparable? x y)
+         (define gte1? (semi-lattice-gte? lattice1))
+         (define gte2? (semi-lattice-gte? lattice2))
+         (define comparable1? (semi-lattice-comparable? lattice1))
+         (define comparable2? (semi-lattice-comparable? lattice2))
+         (define x.1>=y.1 (gte1? (accessor1 x) (accessor1 y)))
+         (define y.1>=x.1 (gte1? (accessor1 y) (accessor1 x)))
+         (define x.1==y.1 (and x.1>=y.1 y.1>=x.1))
+         (if x.1==y.1
+             (comparable2? (accessor2 x) (accessor2 y))
+             (comparable1? (accessor1 x) (accessor1 y))))
+       (define (lifted-comparable?-hash-code x [recur equal-hash-code])
+         ((semi-lattice-comparable?-hash-code lattice1) (accessor1 x) recur))
+       (semi-lattice lifted-join
+                     lifted-gte?
+                     lifted-comparable?
+                     lifted-comparable?-hash-code)))))
 
 ;; pointwise-semi-lattice : [A ... -> B]
 ;;                          ([B -> A] [Semi-Lattice A]) ...
