@@ -1,9 +1,10 @@
 #lang racket
 
-(require "data.rkt"
+(require (prefix-in struct: "data.rkt")
          "derived-lattices.rkt"
          "primitive-lattices.rkt"
-         "operations.rkt")
+         "operations.rkt"
+         "generics.rkt")
 
 (provide (all-from-out "data.rkt")
          (all-from-out "operations.rkt")
