@@ -53,19 +53,54 @@
 (define-generics join-semi-lattice
   [gte? join-semi-lattice right]
   [join join-semi-lattice right]
-  )
+  #:fast-defaults
+  ([list?
+    (define/generic generic-gte? gte?)
+    (define/generic generic-join join)
+    (define (gte? x y)
+      (for/and ([xi x]
+                [yi y])
+        (generic-gte? xi yi)))
+    (define (join x y)
+      (for/list ([xi x]
+                [yi y])
+        (generic-join xi yi)))]))
 
 (define-generics meet-semi-lattice
   [lte? meet-semi-lattice right]
   [meet meet-semi-lattice right]
+  #:fast-defaults
+  ([list?
+    (define/generic generic-lte? lte?)
+    (define/generic generic-meet meet)
+    (define (lte? x y)
+      (for/and ([xi x]
+                [yi y])
+        (generic-lte? xi yi)))
+    (define (meet x y)
+      (for/list ([xi x]
+                [yi y])
+        (generic-meet xi yi)))])
   )
 
 (define-generics bounded-join-semi-lattice
   [bottom bounded-join-semi-lattice]
+  #:fast-defaults
+  ([list?
+    (define/generic generic-bottom bottom)
+    (define (bottom x)
+      (for/list ([xi x])
+        (generic-bottom x)))])
   )
 
 (define-generics bounded-meet-semi-lattice
   [top bounded-meet-semi-lattice]
+  #:fast-defaults
+  ([list?
+    (define/generic generic-top top)
+    (define (top x)
+      (for/list ([xi x])
+        (generic-top x)))])
   )
 
 (define (lattice? x)
