@@ -1,6 +1,7 @@
 #lang racket
 
-(require "data.rkt")
+(require "data.rkt"
+         (for-syntax syntax/parse))
 (provide construct-lattice-from-semi-lattices
          construct-bounded-lattice-from-semi-lattices
          get-join-semi-lattice-from-lattice
@@ -262,29 +263,33 @@
 ;; accessor, `pointwise-semi-lattice' produces a point-wise lifted semi-lattice
 ;; over the structure.
 ;;
-(define-syntax pointwise-semi-lattice
-  (syntax-rules ()
-    ((_ creator (accessor lattice) ...)
-     (let ()
-       (define (lifted-join x y)
-         (creator ((semi-lattice-join lattice) (accessor x)
-                                               (accessor y))
-                  ...))
-       (define (lifted-gte? x y)
-         (and ((semi-lattice-gte? lattice) (accessor x)
-                                           (accessor y))
-              ...))
-       (define (lifted-comparable? x y)
-         (and ((semi-lattice-comparable? lattice) (accessor x)
-                                                  (accessor y))
-              ...))
-       (define (lifted-comparable?-hash-code x [recur equal-hash-code])
-         (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x) recur)
-            ...))
-       (semi-lattice lifted-join
-                     lifted-gte?
-                     lifted-comparable?
-                     lifted-comparable?-hash-code)))))
+(define-syntax (pointwise-semi-lattice stx)
+  (syntax-parse stx
+    ((_:id creator:id (accessor:id lattice:expr) ...)
+     #`(let ()
+         #,(syntax/loc stx
+             (define (lifted-join x y)
+               (creator ((semi-lattice-join lattice) (accessor x)
+                         (accessor y))
+                        ...)))
+         #,(syntax/loc stx
+             (define (lifted-gte? x y)
+               (and ((semi-lattice-gte? lattice) (accessor x)
+                     (accessor y))
+                    ...)))
+         #,(syntax/loc stx
+             (define (lifted-comparable? x y)
+               (and ((semi-lattice-comparable? lattice) (accessor x)
+                     (accessor y))
+                    ...)))
+         #,(syntax/loc stx
+             (define (lifted-comparable?-hash-code x [recur equal-hash-code])
+               (+ ((semi-lattice-comparable?-hash-code lattice) (accessor x) recur)
+                  ...)))
+         (semi-lattice lifted-join
+                       lifted-gte?
+                       lifted-comparable?
+                       lifted-comparable?-hash-code)))))
 
 
 ;; pointwise-bounded-semi-lattice : [A ... -> B]
@@ -316,39 +321,45 @@
 ;; accessor, `pointwise-semi-lattice' produces a point-wise lifted lattice over
 ;; the structure.
 ;;
-(define-syntax pointwise-lattice
-  (syntax-rules ()
-    ((_ creator (accessor lat) ...)
-     (let ()
-       (define (lifted-join x y)
-         (creator ((lattice-join lat) (accessor x)
-                                               (accessor y))
-                  ...))
-       (define (lifted-gte? x y)
-         (and ((lattice-gte? lat) (accessor x)
-                                           (accessor y))
-              ...))
-       (define (lifted-meet x y)
-         (creator ((lattice-meet lat) (accessor x)
-                                               (accessor y))
-                  ...))
-       (define (lifted-lte? x y)
-         (and ((lattice-lte? lat) (accessor x)
-                                           (accessor y))
-              ...))
-       (define (lifted-comparable? x y)
-         (and ((lattice-comparable? lat) (accessor x)
-                                                  (accessor y))
-              ...))
-       (define (lifted-comparable?-hash-code x [recur equal-hash-code])
-         (+ ((lattice-comparable?-hash-code lat) (accessor x) recur)
-            ...))
-       (lattice lifted-join
-                lifted-gte?
-                lifted-meet
-                lifted-lte?
-                lifted-comparable?
-                lifted-comparable?-hash-code)))))
+(define-syntax (pointwise-lattice stx)
+  (syntax-parse stx
+    [(_:id creator:id (accessor:id lat:expr) ...)
+     #`(let ()
+         #,(syntax/loc stx
+             (define (lifted-join x y)
+               (creator ((lattice-join lat) (accessor x)
+                         (accessor y))
+                        ...)))
+         #,(syntax/loc stx
+             (define (lifted-gte? x y)
+               (and ((lattice-gte? lat) (accessor x)
+                     (accessor y))
+                    ...)))
+         #,(syntax/loc stx
+             (define (lifted-meet x y)
+               (creator ((lattice-meet lat) (accessor x)
+                         (accessor y))
+                        ...)))
+         #,(syntax/loc stx
+             (define (lifted-lte? x y)
+               (and ((lattice-lte? lat) (accessor x)
+                     (accessor y))
+                    ...)))
+         #,(syntax/loc stx
+             (define (lifted-comparable? x y)
+               (and ((lattice-comparable? lat) (accessor x)
+                     (accessor y))
+                    ...)))
+         #,(syntax/loc stx
+             (define (lifted-comparable?-hash-code x [recur equal-hash-code])
+               (+ ((lattice-comparable?-hash-code lat) (accessor x) recur)
+                  ...)))
+         (lattice lifted-join
+                  lifted-gte?
+                  lifted-meet
+                  lifted-lte?
+                  lifted-comparable?
+                  lifted-comparable?-hash-code))]))
 
 ;; pointwise-bounded-lattice : [A ... -> B]
 ;;                             ([B -> A] [Lattice A]) ...
